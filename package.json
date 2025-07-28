@@ -1,0 +1,31 @@
+{
+  "name": "gift-card-automation",
+  "version": "1.0.0",
+  "description": "Automated testing for Gift Card functionality",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "test:mobile": "playwright test --project=\"Mobile Chrome\" --project=\"Mobile Safari\"",
+    "test:desktop": "playwright test --project=\"Desktop Chrome\" --project=\"Desktop Firefox\" --project=\"Desktop Safari\"",
+    "test:visual": "playwright test tests/visual/",
+    "test:performance": "playwright test tests/performance/",
+    "report": "playwright show-report",
+    "install:browsers": "playwright install",
+    "lint": "eslint tests/**/*.ts",
+    "format": "prettier --write tests/**/*.ts",
+    "test:ci": "playwright test --reporter=html,junit"
+  },
+  "keywords": ["playwright", "testing", "automation", "gift-card"],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
+  }
+}
