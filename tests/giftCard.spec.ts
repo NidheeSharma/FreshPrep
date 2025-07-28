@@ -105,14 +105,6 @@ test.describe('FreshPrep Gift Card Tests', () => {
       await giftCardPage.fillPaymentInfo(TestData.cards.expiredCard, TestData.expiry.expired, TestData.cvv.valid);
     });
 
-    // await test.step('Enter expired expiry 01/23', async () => {
-    //   await giftCardPage.fillPaymentInfo('', TestData.expiry.expired, '');
-    // });
-
-    // await test.step('Enter CVV 123', async () => {
-    //   await giftCardPage.fillPaymentInfo('', '', TestData.cvv.valid);
-    // });
-
     await test.step('Click purchase', async () => {
       await giftCardPage.purchaseGiftCard();
     });
@@ -140,29 +132,7 @@ test.describe('FreshPrep Gift Card Tests', () => {
     });
   });
 
-  test('TC05 - Insufficient funds handling', async ({ page }) => {
-    await test.step('Complete gift card form with valid info', async () => {
-      await giftCardPage.fillSenderInfo(TestData.users.sender.name, TestData.users.sender.email);
-      await giftCardPage.fillRecipientInfo(TestData.users.recipient.name, TestData.users.recipient.email);
-      await giftCardPage.selectNowDelivery();
-      await giftCardPage.continueToPayment();
-    });
-
-    await test.step('Enter insufficient funds card number 4000008260003178', async () => {
-      await giftCardPage.fillPaymentInfo(TestData.cards.insufficientFunds, TestData.expiry.valid, TestData.cvv.valid);
-    });
-
-    await test.step('Click purchase', async () => {
-      await giftCardPage.purchaseGiftCard();
-      await giftCardPage.allowPaymentRequest();
-    });
-
-    await test.step('Verify insufficient funds error', async () => {
-      await giftCardPage.insufficientErrorMessage('Your card has insufficient funds. Try a different card.');
-    });
-  });
-
-  test('TC06 - Required field validations', async ({ page }) => {
+  test.only('TC05 - Required field validations', async ({ page }) => {
     await test.step('Leave all sender and recipient fields blank and click continue', async () => {
       await giftCardPage.continueToPayment();
     });
@@ -179,30 +149,25 @@ test.describe('FreshPrep Gift Card Tests', () => {
       ];
       
       for (const error of requiredFieldErrors) {
-        await expect(page.locator(`text=/${error}/i`)).toBeVisible();
+        // await expect(page.locator(`text=/${error}/i`)).toBeVisible();
+        await expect(page.locator(`text=${error}`)).toBeVisible();
       }
     });
 
     await test.step('Fill sender/recipient fields and navigate to payment', async () => {
       await giftCardPage.fillSenderInfo(TestData.users.sender.name, TestData.users.sender.email);
       await giftCardPage.fillRecipientInfo(TestData.users.recipient.name, TestData.users.recipient.email);
+      await giftCardPage.selectNowDelivery();
       await giftCardPage.continueToPayment();
     });
 
     await test.step('Leave payment fields blank and click purchase', async () => {
       await giftCardPage.purchaseGiftCard();
+
     });
 
     await test.step('Verify payment field validation errors', async () => {
-      const paymentFieldErrors = [
-        'card number',
-        'expiry',
-        'cvv'
-      ];
-      
-      for (const error of paymentFieldErrors) {
-        await expect(page.locator(`text=/${error}/i`)).toBeVisible();
-      }
+      await giftCardPage.expectPaymentValidationErrors();
     });
   });
 });

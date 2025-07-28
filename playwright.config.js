@@ -38,19 +38,14 @@ export default defineConfig({
       },
     },
     {
-      name: 'Mobile Chrome',
-      use: { 
-        ...devices['Pixel 5'],
-        hasTouch: true,
+      name: 'Mobile Web (iPhone 12)',
+      use: {
+        browserName: 'webkit', // or 'chromium' if preferred
+        viewport: { width: 390, height: 844 },
+        userAgent:
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
         isMobile: true,
-      },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { 
-        ...devices['iPhone 12'],
         hasTouch: true,
-        isMobile: true,
       },
     },
   ],

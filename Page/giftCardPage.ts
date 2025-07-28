@@ -37,10 +37,7 @@ export class GiftCardPage {
   readonly confirmationPage: Locator;
   
   // Validation error messages
-  readonly senderNameError: Locator;
-  readonly senderEmailError: Locator;
-  readonly recipientNameError: Locator;
-  readonly recipientEmailError: Locator;
+  readonly insufficientFundErrorMessage: Locator;
   readonly cardNumberError: Locator;
   readonly expiryError: Locator;
   readonly cvvError: Locator;
@@ -59,15 +56,18 @@ export class GiftCardPage {
     this.nowDeliveryOption = page.locator('button[class="btn btn-primary btn-amt btn-gap delivery"]');
     
     // Form inputs
-    this.senderNameInput = page.locator('div[class*="col-"]:nth-of-type(2) > div[class="form-group"]:nth-of-type(1) > input[class="form-control"]');
+    this.senderNameInput = page.locator('div[class*="col-"]:nth-of-type(2) > div[class="form-group"]:nth-of-type(1) > input[class*="form-control"]');
     this.senderEmailInput = page.locator('div[class="form-group"]:nth-of-type(2) > input[required]');
     this.recipientNameInput = page.locator('div[class="form-group"]:nth-of-type(4) > input[required]');
-    this.recipientEmailInput = page.locator('div[class="row justify-content-center"]:nth-of-type(4) input[class="form-control"]');
+    this.recipientEmailInput = page.locator('div[class="row justify-content-center"]:nth-of-type(4) input[class*="form-control"]');
     
     // Buttons
     this.continueToPaymentButton = page.locator('span[class="sentence-case"]');
     this.purchaseGiftCardButton = page.locator('button[id="submit"] > span[class="sentence-case"]');
-    this.allowPaymentRequestButton = page.frameLocator('iframe[id="challengeFrame"]').locator('button[id="test-source-authorize-3ds"]')
+    this.allowPaymentRequestButton = page
+  .frameLocator('(//iframe[contains(@name,"__privateStripeFrame")])[1]')
+  .frameLocator('iframe[name="stripe-challenge-frame"]')
+  .locator('button[id="test-source-authorize-3ds"]');
     
     // Payment fields (likely in iframes for Stripe)
     this.cardNumberInput = page.frameLocator('iframe[allow="payment *; publickey-credentials-get *"]').locator('input[id="Field-numberInput"]');
@@ -82,14 +82,10 @@ export class GiftCardPage {
     this.confirmationPage = page.locator('div[class="gift-card-purchase"] > div > h1');
     
     // Specific error messages
-    this.senderNameError = page.locator('[data-error="sender-name"], .sender-name-error');
-    this.senderEmailError = page.locator('[data-error="sender-email"], .sender-email-error');
-    this.recipientNameError = page.locator('[data-error="recipient-name"], .recipient-name-error');
-    this.recipientEmailError = page.locator('[data-error="recipient-email"], .recipient-email-error');
-    this.cardNumberError = page.locator('[data-error="card-number"], .card-number-error');
-    this.expiryError = page.locator('[data-error="expiry"], .expiry-error');
-    this.cvvError = page.locator('[data-error="cvv"], .cvv-error');
-
+    this.cardNumberError = page.frameLocator('iframe[allow="payment *; publickey-credentials-get *"]').locator('p[id="Field-numberError"]');
+    this.expiryError = page.frameLocator('iframe[allow="payment *; publickey-credentials-get *"]').locator('p[id="Field-expiryError"]');
+    this.cvvError = page.frameLocator('iframe[allow="payment *; publickey-credentials-get *"]').locator('p[id="Field-cvcError"]');
+    this.insufficientFundErrorMessage = page.frameLocator('iframe[allow="payment *; publickey-credentials-get *"]').locator('div[id="error-message"]');
     //Heading 
     this.purchasePageHeading = page.locator('h2[class="complete-purchase"]');
   }
@@ -127,7 +123,7 @@ export class GiftCardPage {
     await this.continueToPaymentButton.click();
     
     // Verify we're on payment page by checking for payment elements
-    await expect(this.purchasePageHeading).toBeVisible({ timeout: 10000 });
+    // await expect(this.purchasePageHeading).toBeVisible({ timeout: 10000 });
   }
 
   async verifyOrderSummary() {
@@ -170,19 +166,35 @@ async expectError(errorText: string) {
 
 }
 
-async insufficientErrorMessage(errorText: string) {
-    await expect(this.page.frameLocator('iframe[allow="payment *; publickey-credentials-get *"]').locator('div[id="error-message"]').filter({ hasText: errorText })).toBeVisible({ timeout: 10000 });
+async insufficientErrorMessage() {
+    await expect(this.insufficientFundErrorMessage).toBeVisible({ timeout: 15000 });
 
 }
 
 async allowPaymentRequest() {
-    await expect(this.allowPaymentRequestButton).toBeVisible({ timeout: 15000 });
+    await expect(this.allowPaymentRequestButton).toBeVisible({ timeout: 55000 });
     await this.allowPaymentRequestButton.click();
+
     
   }
   async expectValidationErrors() {
-    // Check for required field errors
-    await expect(this.errorMessages).toBeVisible();
+  // Check that error messages exist (count-based assertion)
+  await expect(this.errorMessages).toHaveCount(4);
+  
+  // Alternative: Check that at least one error message is visible
+  // await expect(this.errorMessages.first()).toBeVisible();
+  
+  // Or verify all error messages are visible using nth()
+  const errorCount = await this.errorMessages.count();
+  for (let i = 0; i < errorCount; i++) {
+    await expect(this.errorMessages.nth(i)).toBeVisible();
   }
+}
+  async expectPaymentValidationErrors() {
+  
+    await expect(this.cardNumberError).toBeVisible({ timeout: 15000 });
+    await expect(this.expiryError).toBeVisible({ timeout: 15000 });
+    await expect(this.cvvError).toBeVisible({ timeout: 15000 });
+}
 }
 

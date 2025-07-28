@@ -2,7 +2,12 @@ import { test, expect, devices } from '@playwright/test';
 import { GiftCardPage } from '../Page/giftCardPage';
 import { TestData } from '../tests/testData';
 
-test.use({ ...devices['iPhone 12'] });
+test.use({
+  viewport: { width: 390, height: 844 }, // iPhone 12 resolution
+  userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+  isMobile: true,
+  hasTouch: true,
+});
 
 test.describe('Mobile Gift Card Tests', () => {
 
