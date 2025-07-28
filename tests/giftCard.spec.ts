@@ -1,23 +1,27 @@
 import { test, expect } from '@playwright/test';
 import { GiftCardPage } from '../Page/giftCardPage';
-import { TestData } from '../tests/testData';
+import { TestData } from '../testData/testData';
 
 test.describe('FreshPrep Gift Card Tests', () => {
   let giftCardPage: GiftCardPage;
+  test.use({
+  viewport: { width: 390, height: 844 }, 
+  userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+  isMobile: true,
+  hasTouch: true,
+});
 
   test.beforeEach(async ({ page }) => {
     giftCardPage = new GiftCardPage(page);
     await giftCardPage.goto();
   });
 
-  test('TC01 - Complete gift card purchase workflow', async ({ page }) => {
+  test('T01 - Complete gift card purchase workflow', async ({ page }) => {
     await test.step('Navigate to freshprep.ca/gift', async () => {
-      // Already navigated in beforeEach
       await expect(page).toHaveURL(/.*\/gift/);
     });
 
-    await test.step('$100 amount by clicking Most Popular button', async () => {      
-      // Verify $100 button is highlighted
+    await test.step('By default $100 amount selected', async () => {      
       await expect(giftCardPage.mostPopularButton).toHaveClass(/selected|active|highlighted/);
     });
 
@@ -25,7 +29,7 @@ test.describe('FreshPrep Gift Card Tests', () => {
       await giftCardPage.verifyEmailDeliverySelected();
     });
 
-    await test.step('Enter sender full name and email as john@test.com', async () => {
+    await test.step('Enter sender full name and email', async () => {
       await giftCardPage.fillSenderInfo(TestData.users.sender.name, TestData.users.sender.email);
       
       // Verify fields accept valid data
@@ -33,7 +37,7 @@ test.describe('FreshPrep Gift Card Tests', () => {
       await expect(giftCardPage.senderEmailInput).toHaveValue(TestData.users.sender.email);
     });
 
-    await test.step('Enter recipient name and email as jane@test.com', async () => {
+    await test.step('Enter recipient name and email', async () => {
       await giftCardPage.fillRecipientInfo(TestData.users.recipient.name, TestData.users.recipient.email);
       
       // Verify fields accept valid data
@@ -53,7 +57,7 @@ test.describe('FreshPrep Gift Card Tests', () => {
       await giftCardPage.verifyOrderSummary();
     });
 
-    await test.step('Enter card number 4111 1111 1111 1111', async () => {
+    await test.step('Enter valid card details', async () => {
       await giftCardPage.fillPaymentInfo(TestData.cards.validVisa, TestData.expiry.valid, TestData.cvv.valid);
       await expect(giftCardPage.cardNumberInput).toHaveValue(/4000/);
       await expect(giftCardPage.expiryDateInput).toHaveValue(/12.*26/);
@@ -63,11 +67,11 @@ test.describe('FreshPrep Gift Card Tests', () => {
     });
 
 
-    await test.step('Select "Canada" from country dropdown', async () => {
+    await test.step('Select "Australia" from country dropdown', async () => {
       await giftCardPage.selectCountry('Australia');
     });
 
-    await test.step('Click "Purchase Gift Card"', async () => {
+    await test.step('Click Purchase Gift Card button', async () => {
       await giftCardPage.purchaseGiftCard();
     });
 
@@ -84,7 +88,7 @@ test.describe('FreshPrep Gift Card Tests', () => {
       await giftCardPage.continueToPayment();
     });
 
-    await test.step('Enter invalid card number 1234567890123456', async () => {
+    await test.step('Enter invalid card number', async () => {
       await giftCardPage.fillPaymentInfo(TestData.cards.invalidCard, TestData.expiry.valid, TestData.cvv.valid);
     });
 
@@ -94,14 +98,14 @@ test.describe('FreshPrep Gift Card Tests', () => {
   });
 
   test('TC03 - Expired card rejection', async ({ page }) => {
-    await test.step('Complete gift card form with valid sender and recipient details', async () => {
+    await test.step('Complete gift card form with valid info', async () => {
       await giftCardPage.fillSenderInfo(TestData.users.sender.name, TestData.users.sender.email);
       await giftCardPage.fillRecipientInfo(TestData.users.recipient.name, TestData.users.recipient.email);
       await giftCardPage.selectNowDelivery();
       await giftCardPage.continueToPayment();
     });
 
-    await test.step('Enter valid card number 4111111111111111', async () => {
+    await test.step('Enter valid card number', async () => {
       await giftCardPage.fillPaymentInfo(TestData.cards.expiredCard, TestData.expiry.expired, TestData.cvv.valid);
     });
 
@@ -122,7 +126,7 @@ test.describe('FreshPrep Gift Card Tests', () => {
       await giftCardPage.continueToPayment();
     });
 
-    await test.step('Enter 2-digit CVV: 12', async () => {
+    await test.step('Enter 2-digit CVV', async () => {
       await giftCardPage.fillPaymentInfo(TestData.cards.validVisa, TestData.expiry.valid, TestData.cvv.invalid);
       await giftCardPage.purchaseGiftCard();
     });
@@ -149,7 +153,6 @@ test.describe('FreshPrep Gift Card Tests', () => {
       ];
       
       for (const error of requiredFieldErrors) {
-        // await expect(page.locator(`text=/${error}/i`)).toBeVisible();
         await expect(page.locator(`text=${error}`)).toBeVisible();
       }
     });

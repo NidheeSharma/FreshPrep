@@ -9,8 +9,6 @@ export default defineConfig({
   
   reporter: [
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
-    ['junit', { outputFile: 'test-results/junit.xml' }],
-    ['line']
   ],
   
   use: {

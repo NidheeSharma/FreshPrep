@@ -16,18 +16,18 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-        cache: 'npm'  # Cache npm dependencies for faster builds
+        cache: 'npm'  
     
     - name: Install dependencies
       run: npm install 
     
     - name: Install Playwright Browsers
-      run: npx playwright install --with-deps # Install both browsers you're using
+      run: npx playwright install --with-deps 
     
     - name: Run Playwright tests
       run: npx playwright test
       env:
-        CI: true  # Ensures CI-specific config is used
+        CI: true  
     
     # Upload HTML report (includes screenshots and videos)
     - name: Upload Playwright Report
@@ -46,12 +46,3 @@ jobs:
         name: playwright-test-results-${{ github.run_id }}
         path: test-results/
         retention-days: 30
-
-    # Optional: Add test summary to PR
-    - name: Publish Test Summary
-      uses: dorny/test-reporter@v1
-      if: success() || failure()
-      with:
-        name: Playwright Tests
-        path: test-results/junit.xml
-        reporter: java-junit

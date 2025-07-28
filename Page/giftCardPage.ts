@@ -69,7 +69,7 @@ export class GiftCardPage {
   .frameLocator('iframe[name="stripe-challenge-frame"]')
   .locator('button[id="test-source-authorize-3ds"]');
     
-    // Payment fields (likely in iframes for Stripe)
+    // Payment fields
     this.cardNumberInput = page.frameLocator('iframe[allow="payment *; publickey-credentials-get *"]').locator('input[id="Field-numberInput"]');
     this.expiryDateInput = page.frameLocator('iframe[allow="payment *; publickey-credentials-get *"]').locator('input[id="Field-expiryInput"]');
     this.cvvInput = page.frameLocator('iframe[allow="payment *; publickey-credentials-get *"]').locator('input[id="Field-cvcInput"]');
@@ -95,11 +95,8 @@ export class GiftCardPage {
   }
 
   async verifyEmailDeliverySelected() {
-    // Check if email delivery is pre-selected (green highlight)
     const emailOption = this.emailDeliveryOption;
     await expect(emailOption).toBeVisible();
-    
-    // Check for various ways the selection might be indicated
     await expect(emailOption).toHaveClass(/focus/);
   }
 
@@ -115,35 +112,22 @@ export class GiftCardPage {
 
   async selectNowDelivery() {
     await this.nowDeliveryOption.click();
-    // Verify "Now" is highlighted/selected
     await expect(this.nowDeliveryOption).toHaveClass(/primary/);
   }
 
   async continueToPayment() {
     await this.continueToPaymentButton.click();
-    
-    // Verify we're on payment page by checking for payment elements
-    // await expect(this.purchasePageHeading).toBeVisible({ timeout: 10000 });
   }
 
   async verifyOrderSummary() {
     await expect(this.orderSummary).toBeVisible();
-    
-    // Check for $100 amount
     await expect(this.page.locator('div[class*="col-"] > p:nth-of-type(2)')).toHaveText(' $100');
-    
-    // Check for recipient info
     await expect(this.page.locator('div:nth-of-type(2) > p:nth-of-type(4)')).toBeVisible();
   }
 
   async fillPaymentInfo(cardNumber: string, expiry: string, cvv: string) {
-    // Fill card number
     await this.cardNumberInput.fill(cardNumber);
-    
-    // Fill expiry
     await this.expiryDateInput.fill(expiry);
-    
-    // Fill CVV
     await this.cvvInput.fill(cvv);
   }
 
@@ -178,13 +162,7 @@ async allowPaymentRequest() {
     
   }
   async expectValidationErrors() {
-  // Check that error messages exist (count-based assertion)
   await expect(this.errorMessages).toHaveCount(4);
-  
-  // Alternative: Check that at least one error message is visible
-  // await expect(this.errorMessages.first()).toBeVisible();
-  
-  // Or verify all error messages are visible using nth()
   const errorCount = await this.errorMessages.count();
   for (let i = 0; i < errorCount; i++) {
     await expect(this.errorMessages.nth(i)).toBeVisible();
