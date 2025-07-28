@@ -132,7 +132,7 @@ test.describe('FreshPrep Gift Card Tests', () => {
     });
   });
 
-  test.only('TC05 - Required field validations', async ({ page }) => {
+  test('TC05 - Required field validations', async ({ page }) => {
     await test.step('Leave all sender and recipient fields blank and click continue', async () => {
       await giftCardPage.continueToPayment();
     });
