@@ -22,7 +22,7 @@ jobs:
       run: npm install 
     
     - name: Install Playwright Browsers
-      run: npx playwright install --with-deps webkit chrome  # Install both browsers you're using
+      run: npx playwright install --with-deps # Install both browsers you're using
     
     - name: Run Playwright tests
       run: npx playwright test
