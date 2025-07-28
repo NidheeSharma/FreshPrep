@@ -41,12 +41,10 @@ FreshPrep/
 
 2. **Install dependencies**
    ```bash
-   npm install
-   ```
-
-3. **Install Playwright browsers**
-   ```bash
-   npm run install:browsers
+    npm install -D @playwright/test@latest
+    npm install -D typescript@latest
+    npm install -D @types/node@latest
+    npx playwright install
    ```
 
 ##  Test Scenarios Covered
